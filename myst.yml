@@ -1,0 +1,19 @@
+version: 1
+project:
+  id: 8a962870-a9b7-4d81-9e54-ba111cb633c7
+  title: Project 2: Reproducibility in Natural Langauge Processing
+  description: The goal of this project is to explore reproducibility specficially within natural language processing through the use of a collection of presidents' US State of the Union speeches.
+  authors: Sunghyun Ahn, Megan Dhillon, Yoohan Park, Breitling Snyder
+  toc: 
+      - file: README.md
+      - file: nlp_P01.ipynb
+      - file: nlp_P02.ipynb
+      - file: nlp_P03.ipynb
+      - file: nlp_P04.ipynb
+      - file: proj02-nlp.ipynb
+      
+  github: https://github.com/UCB-stat-159-f25/proj02-group14  
+site:
+  template: book-theme
+  options:
+      logo: site_logo.png
