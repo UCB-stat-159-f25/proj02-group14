@@ -1,0 +1,138 @@
+Question 4:
+I wanted to learn more about the relationship between nlp.pipe() and its connection to lemmatization.
+
+Prompt: Can you explain more how the nlp.pipe() works and how it relates to lemmatization
+
+Output:
+Here’s an explanation focused on how `nlp.pipe()` *actually works internally* and how it connects to **lemmatization** specifically.
+
+---
+
+## How `nlp.pipe()` actually works
+
+When you call:
+
+```python
+docs = nlp.pipe(texts)
+```
+
+spaCy does a few important things behind the scenes:
+
+### 1. **It streams your texts instead of loading everything at once**
+
+`nlp.pipe()` returns a generator. That means it processes one batch at a time and yields `Doc` objects as they’re ready.
+
+Your memory usage stays low, which matters for big corpora.
+
+---
+
+### 2. **It batches texts into groups**
+
+spaCy takes your list and splits it into batches:
+
+* default batch size is around **1000 tokens**, not 1000 texts
+* you can change it using `batch_size=`
+
+Example:
+
+```python
+for doc in nlp.pipe(texts, batch_size=100):
+    ...
+```
+
+Why batching matters: spaCy’s internal models (tagger, parser, NER) run **much faster** when they can operate on multiple examples at once.
+
+---
+
+### 3. **It runs the full pipeline on each batch**
+
+The key point:
+`nlp.pipe()` still runs **every pipeline component** on each text unless you disable something.
+
+Pipeline components typically include:
+
+* tokenizer
+* tagger
+* parser
+* named entity recognizer
+* attribute ruler
+* lemmatizer
+
+So during `nlp.pipe()`:
+
+1. Text is tokenized
+2. Tokens go to the tagger
+3. POS tags and morphological features are assigned
+4. **Lemmatizer uses these tags/features to compute lemmas**
+5. The doc is yielded
+
+This means **lemmatization absolutely happens inside `nlp.pipe()`**, just like with `nlp()`.
+
+Nothing is skipped. It’s just more efficient.
+
+---
+
+## How `nlp.pipe()` relates to lemmatization
+
+Lemmatization in spaCy depends on:
+
+* the token’s part-of-speech tag
+* morphological features
+* rules and lookup tables
+* (in older versions) statistical models
+
+All of that is part of the pipeline.
+
+### So when you use `nlp.pipe()`, each token receives a lemma normally, because:
+
+* the tagger runs
+* morphology is predicted
+* then the lemmatizer uses that information
+* and the resulting lemma is stored in `token.lemma_`
+
+Example:
+
+```python
+for doc in nlp.pipe(["walking", "ate", "better"]):
+    print([token.lemma_ for token in doc])
+```
+
+This will produce the same output as if you processed each text with:
+
+```python
+doc = nlp(text)
+```
+
+## Quick example showing how they differ in practice
+
+### Using `nlp()` in a loop
+
+```python
+lemmas = []
+for text in texts:
+    doc = nlp(text)
+    lemmas.append([token.lemma_ for token in doc])
+```
+
+This works but is slower.
+
+---
+
+### Using `nlp.pipe()`
+
+```python
+lemmas = []
+for doc in nlp.pipe(texts):
+    lemmas.append([token.lemma_ for token in doc])
+```
+
+Same result.
+Way faster.
+
+---
+
+## Summary
+
+When you use `nlp.pipe()`, spaCy is just processing your texts in a smarter way. It still runs the tagger, parser, and lemmatizer, but it batches everything so the model can work more efficiently. Since lemmatization depends on POS tags and morphology, and those are expensive to compute, `nlp.pipe()` is usually what you want if you’re lemmatizing a big dataset.
+
+If you want, I can also show you a timing comparison or walk through how lemmatization is implemented inside spaCy’s pipeline.
