@@ -1,3 +1,11 @@
+I used chatgpt to ask “How do I preserve the original order in which the sou data appears when plotting? The output mentioned reindex. How should I write the code for this?”
+
+AI Output (Summary):
+The AI explained that I could maintain the original ordering of the sou data by using reindex before plotting. It also mentioned that drop_duplicates() may be useful if I needed to remove repeated entries while keeping the first occurrence in the original order. The assistance focused only on explaining these functions conceptually. 
+
+
+
+
 Question 4:
 I wanted to learn more about the relationship between nlp.pipe() and its connection to lemmatization.
 
